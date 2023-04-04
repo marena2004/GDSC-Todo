@@ -34,7 +34,7 @@ jobs:
           gcloud compute ssh --command="docker image prune -af" || true
       - name: Upload to GCE
         run: |
-          gcloud compute scp --recurse . $GCE_INSTANCE:~/todo --zone=$GCE_INSTANCE_ZONE
+          gcloud compute scp --recurse . amazichannel@$GCE_INSTANCE:~/todo --zone=$GCE_INSTANCE_ZONE
       - name: Deploy on GCE
         run: |
           gcloud compute ssh --command="cd ~/todo && docker compose up --build -d"
