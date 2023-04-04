@@ -44,7 +44,7 @@ jobs:
           command: "(docker image prune -af) || true"
       - name: Upload to GCE
         run: |
-          echo ${{ GCP_SSH_PRIV_KEY }} > .priv_key
+          echo ${{ secrets.GCP_SSH_PRIV_KEY }} > .priv_key
           gcloud compute scp --recurse . --ssh-key-file=./.priv_key amazichannel@$GCE_INSTANCE:~/todo --zone=$GCE_INSTANCE_ZONE
       - name: Deploy on GCE
         uses: 'google-github-actions/ssh-compute@v0'
