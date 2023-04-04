@@ -28,28 +28,14 @@ jobs:
           token_format: 'access_token'
           workload_identity_provider: '${{ secrets.GCP_WIP }}'
           service_account: '${{ secrets.GCP_SERVICE_ACCOUNT }}' # e.g. - my-service-account@my-project.iam.gserviceaccount.com
-      - name: Remove files
-        uses: 'google-github-actions/ssh-compute@v0'
-        with:
-          instance_name: $GCE_INSTANCE
-          zone: $GCE_ZONE
-          ssh_private_key: ${{ secrets.GCP_SSH_PRIV_KEY }}
-          command: "(cd ~/todo && docker compose down && cd ~ && rm -R ~/todo) || true"
-      - name: Remove docker images
-        uses: 'google-github-actions/ssh-compute@v0'
-        with:
-          instance_name: $GCE_INSTANCE
-          zone: $GCE_ZONE
-          ssh_private_key: ${{ secrets.GCP_SSH_PRIV_KEY }}
-          command: "(docker image prune -af) || true"
-      - name: Upload to GCE
+      - name: Remove files and images anyway
         run: |
           echo ${{ secrets.GCP_SSH_PRIV_KEY }} > .priv_key
-          gcloud compute scp --recurse . --ssh-key-file=./.priv_key amazichannel@$GCE_INSTANCE:~/todo --zone=$GCE_INSTANCE_ZONE
+          gcloud compute ssh $GCE_INSTANCE --ssh-key-file=./.priv_key --command="cd ~/todo && docker compose down && cd ~ && rm -R ~/todo" || true
+          gcloud compute ssh $GCE_INSTANCE --ssh-key-file=./.priv_key --command="docker image prune -af" || true
+      - name: Upload to GCE
+        run: |
+          gcloud compute scp --recurse . $GCE_INSTANCE:~/todo --zone=$GCE_INSTANCE_ZONE
       - name: Deploy on GCE
-        uses: 'google-github-actions/ssh-compute@v0'
-        with:
-          instance_name: $GCE_INSTANCE
-          zone: $GCE_ZONE
-          ssh_private_key: ${{ secrets.GCP_SSH_PRIV_KEY }}
-          command: "cd ~/todo && docker compose up --build -d"
+        run: |
+          gcloud compute ssh $GCE_INSTANCE --ssh-key-file=./.priv_key --command="cd ~/todo && docker compose up --build -d"
