@@ -6,8 +6,8 @@ on:
 
 env:
   PROJECT_ID: '${{ secrets.GCP_PROJECT_ID }}' # TODO: update Google Cloud project id
-  GCE_INSTANCE: gdsc-todo-vm
-  GCE_ZONE: us-central1-a
+  GCE_INSTANCE: 'gdsc-todo-vm'
+  GCE_ZONE: 'us-central1-a'
 
 jobs:
   deploy:
