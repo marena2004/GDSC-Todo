@@ -30,12 +30,12 @@ jobs:
           service_account: '${{ secrets.GCP_SERVICE_ACCOUNT }}' # e.g. - my-service-account@my-project.iam.gserviceaccount.com
       - name: Remove files and images anyway
         run: |
-          echo ${{ secrets.GCP_SSH_PRIV_KEY }} > .priv_key
-          gcloud compute ssh $GCE_INSTANCE --ssh-key-file=./.priv_key --command="cd ~/todo && docker compose down && cd ~ && rm -R ~/todo" || true
-          gcloud compute ssh $GCE_INSTANCE --ssh-key-file=./.priv_key --command="docker image prune -af" || true
+          echo "${{ secrets.GCP_SSH_PRIV_KEY }}" > .priv_key
+          gcloud compute ssh $GCE_INSTANCE --zone=$GCE_INSTANCE_ZONE --ssh-key-file=./.priv_key --command="cd ~/todo && docker compose down && cd ~ && rm -R ~/todo" || true
+          gcloud compute ssh $GCE_INSTANCE --zone=$GCE_INSTANCE_ZONE --ssh-key-file=./.priv_key --command="docker image prune -af" || true
       - name: Upload to GCE
         run: |
           gcloud compute scp --recurse . $GCE_INSTANCE:~/todo --zone=$GCE_INSTANCE_ZONE
       - name: Deploy on GCE
         run: |
-          gcloud compute ssh $GCE_INSTANCE --ssh-key-file=./.priv_key --command="cd ~/todo && docker compose up --build -d"
+          gcloud compute ssh $GCE_INSTANCE --zone=$GCE_INSTANCE_ZONE --ssh-key-file=./.priv_key --command="cd ~/todo && docker compose up --build -d"
