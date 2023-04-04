@@ -1,2 +1,2 @@
 # Hello GDSC
-\nLatest Commit: ``
+Generated using: `.github/workflows/hellogdsc.yml`
