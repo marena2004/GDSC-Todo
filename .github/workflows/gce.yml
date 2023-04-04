@@ -31,11 +31,12 @@ jobs:
       - name: Remove files and images anyway
         run: |
           echo "${{ secrets.GCP_SSH_PRIV_KEY }}" > .priv_key
+          echo "${{ secrets.GCP_PUB_KEY }}" > .priv_key.pub
           gcloud compute ssh $GCE_INSTANCE --zone=$GCE_INSTANCE_ZONE --ssh-key-file=./.priv_key --command="cd ~/todo && docker compose down && cd ~ && rm -R ~/todo" || true
           gcloud compute ssh $GCE_INSTANCE --zone=$GCE_INSTANCE_ZONE --ssh-key-file=./.priv_key --command="docker image prune -af" || true
       - name: Upload to GCE
         run: |
-          gcloud compute scp --recurse . $GCE_INSTANCE:~/todo --zone=$GCE_INSTANCE_ZONE
+          gcloud compute scp --recurse . $GCE_INSTANCE:~/todo --zone=$GCE_INSTANCE_ZONE --ssh-key-file=./.priv_key
       - name: Deploy on GCE
         run: |
           gcloud compute ssh $GCE_INSTANCE --zone=$GCE_INSTANCE_ZONE --ssh-key-file=./.priv_key --command="cd ~/todo && docker compose up --build -d"
