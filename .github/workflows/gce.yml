@@ -1,0 +1,41 @@
+name: Deploy on GCE
+
+on:
+  push:
+    branches: [ "master" ]
+
+env:
+  PROJECT_ID: '${{ secrets.GCP_PROJECT_ID }}' # TODO: update Google Cloud project id
+  GCE_INSTANCE: gdsc-todo-vm
+  GCE_ZONE: us-central1-a
+
+jobs:
+  deploy:
+    # Add 'id-token' with the intended permissions for workload identity federation
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Google Auth
+        id: auth
+        uses: 'google-github-actions/auth@v0'
+        with:
+          token_format: 'access_token'
+          service_account: '${{ secrets.GCP_SERVICE_ACCOUNT }}' # e.g. - my-service-account@my-project.iam.gserviceaccount.com
+      - name: Remove files and images anyway
+        run: |
+          gcloud compute ssh --command="cd ~/todo && docker compose down && cd ~ && rm -R ~/todo" || true
+          gcloud compute ssh --command="docker image prune -af" || true
+      - name: Upload to GCE
+        run: |
+          gcloud compute scp --recurse . $GCE_INSTANCE:~/todo --zone=$GCE_INSTANCE_ZONE
+      - name: Deploy on GCE
+        run: |
+          gcloud compute ssh --command="cd ~/todo && docker compose up --build -d"
+      
+          
