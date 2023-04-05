@@ -1,0 +1,22 @@
+name: Send Message to GDSC List
+
+on:
+  push:
+    branches:
+    - 'master'
+    paths-ignore:
+    - '**.yml'
+
+permissions:
+  contents: read
+  
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Send Request to Listmoz
+        run: |-
+          curl -X POST "https://listmoz.com/actions?action=ADD" \
+          -H "Content-Type: application/json" \
+          -d "{\"description\": \"${{ github.event.head_commit.message }} @ ${{ github.event.repository }}\", \"force_creation_of_new_list\": false, \"mod_url\": \"kbCSql71XfnrmvQH8h0L\", \"read_url\": \"3hpD1jzJVVGg2lFyTSvG\"}"
