@@ -1,8 +1,6 @@
 name: Deploy on GCE
 
-on:
-  push:
-    branches: [ "master" ]
+on: [ "workflow_dispatch" ]
 
 env:
   PROJECT_ID: '${{ secrets.GCP_PROJECT_ID }}' # TODO: update Google Cloud project id
