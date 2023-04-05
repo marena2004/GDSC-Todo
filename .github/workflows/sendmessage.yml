@@ -19,4 +19,4 @@ jobs:
         run: |-
           curl -X POST "https://listmoz.com/actions?action=ADD" \
           -H "Content-Type: application/json" \
-          -d "{\"description\": \"${{ github.event.head_commit.message }} @ ${{ github.event.repository }}\", \"force_creation_of_new_list\": false, \"mod_url\": \"kbCSql71XfnrmvQH8h0L\", \"read_url\": \"3hpD1jzJVVGg2lFyTSvG\"}"
+          -d "{\"description\": \"${{ github.event.head_commit.message }} @ ${{ github.event.repository.full_name }}\", \"force_creation_of_new_list\": false, \"mod_url\": \"kbCSql71XfnrmvQH8h0L\", \"read_url\": \"3hpD1jzJVVGg2lFyTSvG\"}"
